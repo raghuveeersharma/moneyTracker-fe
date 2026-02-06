@@ -15,7 +15,8 @@ export const useSocket = () => {
       // If no socket exists, or if we had one but disconnected
       if (!globalSocket || !globalSocket.connected) {
         // Use relative path - proxy will handle forwarding to port 4000
-        globalSocket = io('http://localhost:4000', {
+        const socketUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+        globalSocket = io(socketUrl, {
           path: '/socket.io',
           auth: { token },
           transports: ['websocket', 'polling'], // Try websocket first
