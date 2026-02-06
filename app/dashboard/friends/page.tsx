@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import {
     useGetFriendsQuery,
     useGetPendingRequestsQuery,
@@ -20,7 +20,6 @@ import {
     IconButton,
     Button,
     Typography,
-    Box,
     TextField,
     Chip,
     Avatar,

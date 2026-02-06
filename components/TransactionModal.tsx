@@ -65,11 +65,15 @@ export default function TransactionModal({ open, onClose, transaction }: Props) 
                 notes: transaction.notes,
             });
             // Try to find the friend
+            // Try to find the friend
             const cpId = typeof transaction.counterpartyId === 'string'
                 ? transaction.counterpartyId
                 : transaction.counterpartyId._id;
             const friend = friends?.find(f => f._id === cpId);
-            setSelectedFriend(friend || null);
+            if (selectedFriend?._id !== friend?._id) {
+                // eslint-disable-next-line react-hooks/set-state-in-effect
+                setSelectedFriend(friend || null);
+            }
         } else {
             reset({
                 type: 'lend',
@@ -80,9 +84,11 @@ export default function TransactionModal({ open, onClose, transaction }: Props) 
                 date: new Date().toISOString().split('T')[0],
                 notes: '',
             });
-            setSelectedFriend(null);
+            if (selectedFriend !== null) {
+                setSelectedFriend(null);
+            }
         }
-    }, [transaction, reset, open, friends]);
+    }, [transaction, reset, open, friends]); // Removed selectedFriend from deps to rely on state update mechanism
 
     const handleFriendChange = (friend: Friend | null) => {
         setSelectedFriend(friend);

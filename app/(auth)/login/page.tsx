@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setCredentials } from '../../../features/auth/authSlice';
 import { RootState } from '../../../store';
 import { useRouter } from 'next/navigation';
-import { Container, Paper, Typography, TextField, Button, Box, Alert } from '@mui/material';
+import { Container, Paper, Typography, TextField, Button, Alert } from '@mui/material';
 import Link from 'next/link';
 
 export default function LoginPage() {
@@ -40,6 +40,8 @@ export default function LoginPage() {
         return null;
     }
 
+    const errorMsg = (error as { data?: { message?: string } } | undefined)?.data?.message;
+
     return (
         <Container maxWidth="xs" sx={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Paper sx={{ p: 4, width: '100%', display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -47,7 +49,7 @@ export default function LoginPage() {
 
                 {error && (
                     <Alert severity="error">
-                        {(error as any)?.data?.message || 'Login failed'}
+                        {errorMsg || 'Login failed'}
                     </Alert>
                 )}
 
@@ -80,7 +82,7 @@ export default function LoginPage() {
                 </form>
 
                 <Typography align="center" variant="body2" color="text.secondary">
-                    Don't have an account? <Link href="/register" style={{ color: '#6C63FF' }}>Sign up</Link>
+                    Don&apos;t have an account? <Link href="/register" style={{ color: '#6C63FF' }}>Sign up</Link>
                 </Typography>
             </Paper>
         </Container>

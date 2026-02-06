@@ -41,6 +41,8 @@ export default function RegisterPage() {
         return null;
     }
 
+    const errorMsg = (error as { data?: { message?: string } } | undefined)?.data?.message;
+
     return (
         <Container maxWidth="xs" sx={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Paper sx={{ p: 4, width: '100%', display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -48,7 +50,7 @@ export default function RegisterPage() {
 
                 {error && (
                     <Alert severity="error">
-                        {(error as any)?.data?.message || 'Registration failed'}
+                        {errorMsg || 'Registration failed'}
                     </Alert>
                 )}
 

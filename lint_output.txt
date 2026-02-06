@@ -1,0 +1,105 @@
+yarn run v1.22.22
+$ eslint
+
+/home/developer/Desktop/moneyTracker/frontend/app/(auth)/login/page.tsx
+   9:59  warning  'Box' is defined but never used                                  @typescript-eslint/no-unused-vars
+  50:36  error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  83:24  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/home/developer/Desktop/moneyTracker/frontend/app/(auth)/register/page.tsx
+  51:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/developer/Desktop/moneyTracker/frontend/app/dashboard/chat/page.tsx
+  37:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/developer/Desktop/moneyTracker/frontend/app/dashboard/chat/page.tsx:37:13
+  35 |     useEffect(() => {
+  36 |         if (serverMessages) {
+> 37 |             setLocalMessages(serverMessages);
+     |             ^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  38 |         }
+  39 |     }, [serverMessages]);
+  40 |                            react-hooks/set-state-in-effect
+  76:9   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/developer/Desktop/moneyTracker/frontend/app/dashboard/chat/page.tsx:76:9
+  74 |     // Clear messages when switching friends
+  75 |     useEffect(() => {
+> 76 |         setLocalMessages([]);
+     |         ^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  77 |     }, [selectedFriend?._id]);
+  78 |
+  79 |     const handleSend = async () => {  react-hooks/set-state-in-effect
+
+/home/developer/Desktop/moneyTracker/frontend/app/dashboard/profile/page.tsx
+  28:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/developer/Desktop/moneyTracker/frontend/app/dashboard/profile/page.tsx:28:13
+  26 |         if (user) {
+  27 |             // Only update if values are unset or different to prevent loop
+> 28 |             setUsername((prev) => prev || user.username);
+     |             ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  29 |             setEmail((prev) => prev || user.email);
+  30 |         }
+  31 |     }, [user]);  react-hooks/set-state-in-effect
+
+/home/developer/Desktop/moneyTracker/frontend/components/TransactionModal.tsx
+  74:17  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/developer/Desktop/moneyTracker/frontend/components/TransactionModal.tsx:74:17
+  72 |             const friend = friends?.find(f => f._id === cpId);
+  73 |             if (selectedFriend?._id !== friend?._id) {
+> 74 |                 setSelectedFriend(friend || null);
+     |                 ^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  75 |             }
+  76 |         } else {
+  77 |             reset({  react-hooks/set-state-in-effect
+  90:8   warning  React Hook useEffect has a missing dependency: 'selectedFriend'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         react-hooks/exhaustive-deps
+
+/home/developer/Desktop/moneyTracker/frontend/hooks/useSocket.ts
+  47:9  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/developer/Desktop/moneyTracker/frontend/hooks/useSocket.ts:47:9
+  45 |       // Update local state if different
+  46 |       if (socket !== socketInstance) {
+> 47 |         setSocket(socketInstance);
+     |         ^^^^^^^^^ Avoid calling setState() directly within an effect
+  48 |       }
+  49 |
+  50 |       // Join room logic - handled here to cover both initial connect and re-renders  react-hooks/set-state-in-effect
+  69:6  warning  React Hook useEffect has a missing dependency: 'socket'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       react-hooks/exhaustive-deps
+
+✖ 11 problems (8 errors, 3 warnings)
+
+error Command failed with exit code 1.
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.

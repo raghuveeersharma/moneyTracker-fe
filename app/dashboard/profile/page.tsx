@@ -24,8 +24,10 @@ export default function ProfilePage() {
 
     useEffect(() => {
         if (user) {
-            setUsername(user.username);
-            setEmail(user.email);
+            // Only update if values are unset or different to prevent loop
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setUsername((prev) => prev || user.username);
+            setEmail((prev) => prev || user.email);
         }
     }, [user]);
 
@@ -39,7 +41,13 @@ export default function ProfilePage() {
         }
 
         try {
-            const updateData: any = {};
+            interface UpdateData {
+                username?: string;
+                email?: string;
+                currentPassword?: string;
+                newPassword?: string;
+            }
+            const updateData: UpdateData = {};
 
             if (username !== user?.username) updateData.username = username;
             if (email !== user?.email) updateData.email = email;
@@ -65,8 +73,10 @@ export default function ProfilePage() {
             setCurrentPassword('');
             setNewPassword('');
             setConfirmPassword('');
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Failed to update profile:', err);
+            const errorObj = err as { data?: { message?: string } };
+            setLocalError(errorObj?.data?.message || 'Update failed');
         }
     };
 
@@ -91,7 +101,7 @@ export default function ProfilePage() {
 
                 {(error || localError) && (
                     <Alert severity="error" sx={{ mb: 2 }}>
-                        {localError || (error as any)?.data?.message || 'Update failed'}
+                        {localError || 'Update failed'}
                     </Alert>
                 )}
 

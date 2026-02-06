@@ -15,7 +15,7 @@ export default function AuthInitializer() {
             try {
                 const user = JSON.parse(userStr);
                 dispatch(setCredentials({ user, token }));
-            } catch (e) {
+            } catch {
                 dispatch(initializeAuth());
             }
         } else {

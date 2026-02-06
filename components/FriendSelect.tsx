@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+// useState removed because it was unused
 import { Autocomplete, TextField, Avatar, Box, Typography } from '@mui/material';
 import { useGetFriendsQuery, Friend } from '../features/friends/friendApi';
 

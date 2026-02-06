@@ -34,6 +34,7 @@ export default function ChatPage() {
     // Update local messages when server messages change
     useEffect(() => {
         if (serverMessages) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setLocalMessages(serverMessages);
         }
     }, [serverMessages]);
@@ -73,6 +74,7 @@ export default function ChatPage() {
 
     // Clear messages when switching friends
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setLocalMessages([]);
     }, [selectedFriend?._id]);
 
