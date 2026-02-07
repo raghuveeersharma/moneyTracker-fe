@@ -42,14 +42,19 @@ export const transactionApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['Transaction'],
     }),
+    getFriendTransactions: builder.query<any, { friendId: string; page: number; limit: number }>({
+      query: ({ friendId, page, limit }) => `/transactions/friend/${friendId}?page=${page}&limit=${limit}`,
+      providesTags: ['Transaction'],
+    }),
   }),
 });
 
 export const {
   useGetTransactionsQuery,
-  useGetDashboardStatsQuery,
   useAddTransactionMutation,
+  useGetDashboardStatsQuery,
   useUpdateTransactionMutation,
   useRespondToTransactionMutation,
   useDeleteTransactionMutation,
+  useGetFriendTransactionsQuery,
 } = transactionApi;

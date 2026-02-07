@@ -5,6 +5,7 @@ export interface Friend {
   friendshipId: string;
   username: string;
   email: string;
+  unreadCount?: number;
 }
 
 export interface FriendRequest {
