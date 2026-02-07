@@ -3,6 +3,7 @@
 import { Provider } from 'react-redux';
 import { store } from './store';
 import AuthInitializer from './components/AuthInitializer';
+import GlobalSocketListener from './components/GlobalSocketListener';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import { ReactNode } from 'react';
 
@@ -46,6 +47,7 @@ export function Providers({ children }: { children: ReactNode }) {
     return (
         <Provider store={store}>
             <AuthInitializer />
+            <GlobalSocketListener />
             <ThemeProvider theme={theme}>
                 <CssBaseline />
                 {children}

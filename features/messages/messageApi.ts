@@ -23,7 +23,14 @@ export const messageApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['Message'],
     }),
+    markMessagesAsRead: builder.mutation<void, string>({
+      query: (friendId) => ({
+        url: `/messages/read/${friendId}`,
+        method: 'PUT',
+      }),
+      invalidatesTags: ['Message', 'Friend'], // Invalidate Friend to update unread count
+    }),
   }),
 });
 
-export const { useGetMessagesQuery, useSendMessageMutation } = messageApi;
+export const { useGetMessagesQuery, useSendMessageMutation, useMarkMessagesAsReadMutation } = messageApi;

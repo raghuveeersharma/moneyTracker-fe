@@ -6,11 +6,13 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../../store';
 import {
     Paper, List, ListItem, ListItemButton, ListItemText, ListItemAvatar,
-    Avatar, Typography, TextField, IconButton, Box, Divider, CircularProgress, Chip
+    Avatar, Typography, TextField, IconButton, Box, Divider, CircularProgress, Chip, Badge
 } from '@mui/material';
+import { apiSlice } from '../../../features/api/apiSlice';
+import { useDispatch } from 'react-redux';
 import SendIcon from '@mui/icons-material/Send';
 import { useGetFriendsQuery, Friend } from '../../../features/friends/friendApi';
-import { useGetMessagesQuery, useSendMessageMutation, ChatMessage } from '../../../features/messages/messageApi';
+import { useGetMessagesQuery, useSendMessageMutation, useMarkMessagesAsReadMutation, ChatMessage } from '../../../features/messages/messageApi';
 import MotionWrapper from '../../../components/MotionWrapper';
 
 export default function ChatPage() {
@@ -22,6 +24,9 @@ export default function ChatPage() {
     const [inputText, setInputText] = useState('');
     const [localMessages, setLocalMessages] = useState<ChatMessage[]>([]);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const dispatch = useDispatch();
+
+    const [markMessagesAsRead] = useMarkMessagesAsReadMutation();
 
     // Fetch messages for selected friend
     const { data: serverMessages, isLoading: loadingMessages } = useGetMessagesQuery(
@@ -57,6 +62,16 @@ export default function ChatPage() {
                     if (prev.some(m => m._id === message._id)) return prev;
                     return [...prev, message];
                 });
+
+                // If we are looking at this chat, mark as read immediately
+                if (message.senderId === selectedFriend._id) {
+                    markMessagesAsRead(selectedFriend._id);
+                }
+            } else {
+                // If not relevant (different friend), or no selected friend
+                // Refetch friends list to update unread counts
+                // We could also do optimistic update but refetch is safer/easier
+                dispatch(apiSlice.util.invalidateTags(['Friend']));
             }
         };
 
@@ -65,7 +80,7 @@ export default function ChatPage() {
         return () => {
             socket.off('receive_message', handleReceiveMessage);
         };
-    }, [socket, selectedFriend]);
+    }, [socket, selectedFriend, dispatch, markMessagesAsRead]);
 
     // Scroll to bottom when messages change
     useEffect(() => {
@@ -73,10 +88,14 @@ export default function ChatPage() {
     }, [localMessages]);
 
     // Clear messages when switching friends
+    // Also mark as read
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setLocalMessages([]);
-    }, [selectedFriend?._id]);
+        if (selectedFriend) {
+            markMessagesAsRead(selectedFriend._id);
+        }
+    }, [selectedFriend?._id, markMessagesAsRead]);
 
     const handleSend = async () => {
         if (!selectedFriend || !inputText.trim() || !user) {
@@ -176,7 +195,9 @@ export default function ChatPage() {
                                     onClick={() => setSelectedFriend(friend)}
                                 >
                                     <ListItemAvatar>
-                                        <Avatar>{friend.username[0].toUpperCase()}</Avatar>
+                                        <Badge badgeContent={friend.unreadCount} color="error">
+                                            <Avatar>{friend.username[0].toUpperCase()}</Avatar>
+                                        </Badge>
                                     </ListItemAvatar>
                                     <ListItemText primary={friend.username} />
                                 </ListItemButton>

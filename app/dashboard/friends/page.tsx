@@ -35,6 +35,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import PeopleIcon from '@mui/icons-material/People';
 import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
 import MotionWrapper from '../../../components/MotionWrapper';
+import TransactionHistoryModal from '../../../components/TransactionHistoryModal';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 
 // Debounce hook
 function useDebounce<T>(value: T, delay: number): T {
@@ -66,6 +68,19 @@ export default function FriendsPage() {
 
     const [searchQuery, setSearchQuery] = useState('');
     const debouncedSearch = useDebounce(searchQuery, 300);
+
+    const [historyModalOpen, setHistoryModalOpen] = useState(false);
+    const [selectedFriendForHistory, setSelectedFriendForHistory] = useState<{ id: string; name: string } | null>(null);
+
+    const handleOpenHistory = (friendId: string, friendName: string) => {
+        setSelectedFriendForHistory({ id: friendId, name: friendName });
+        setHistoryModalOpen(true);
+    };
+
+    const handleCloseHistory = () => {
+        setHistoryModalOpen(false);
+        setSelectedFriendForHistory(null);
+    };
 
     // Auto-search when debounced value changes
     useEffect(() => {
@@ -222,6 +237,14 @@ export default function FriendsPage() {
                                 </ListItemAvatar>
                                 <ListItemText primary={friend.username} secondary={friend.email} />
                                 <ListItemSecondaryAction>
+                                    <IconButton
+                                        color="primary"
+                                        onClick={() => handleOpenHistory(friend._id, friend.username)}
+                                        sx={{ mr: 1 }}
+                                        title="View Transaction History"
+                                    >
+                                        <ReceiptLongIcon />
+                                    </IconButton>
                                     <IconButton edge="end" color="error" onClick={() => removeFriend(friend.friendshipId)}>
                                         <DeleteIcon />
                                     </IconButton>
@@ -233,6 +256,13 @@ export default function FriendsPage() {
                     <Typography color="text.secondary">No friends yet. Search for users above!</Typography>
                 )}
             </Paper>
-        </MotionWrapper>
+
+            <TransactionHistoryModal
+                open={historyModalOpen}
+                onClose={handleCloseHistory}
+                friendId={selectedFriendForHistory?.id || null}
+                friendName={selectedFriendForHistory?.name}
+            />
+        </MotionWrapper >
     );
 }
