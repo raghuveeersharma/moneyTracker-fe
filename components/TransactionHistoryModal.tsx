@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
 import {
     Dialog,
     DialogTitle,
@@ -12,15 +11,12 @@ import {
     Paper,
     CircularProgress,
     Chip,
-    Divider
 } from '@mui/material';
 import { List } from 'react-window';
 import { AutoSizer } from 'react-virtualized-auto-sizer';
 import { useGetFriendTransactionsQuery } from '../features/transactions/transactionsApi';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 
 interface TransactionHistoryModalProps {
     open: boolean;
@@ -31,8 +27,6 @@ interface TransactionHistoryModalProps {
 
 export default function TransactionHistoryModal({ open, onClose, friendId, friendName }: TransactionHistoryModalProps) {
     const { user } = useSelector((state: RootState) => state.auth);
-    const [page, setPage] = useState(1);
-    const [allTransactions, setAllTransactions] = useState<any[]>([]);
 
     // We will fetch ALL or large chunk for virtualization to be effective without complex infinite loader for now
     // Or we could implement iterative loading.
@@ -43,7 +37,7 @@ export default function TransactionHistoryModal({ open, onClose, friendId, frien
     // Let's try page 1 with 100 limit.
 
     const limit = 1000; // Fetching a large number effectively simulates "all" for personal finance context typically
-    const { data, isLoading, isFetching } = useGetFriendTransactionsQuery(
+    const { data, isLoading } = useGetFriendTransactionsQuery(
         { friendId: friendId || '', page: 1, limit },
         { skip: !friendId || !open }
     );
@@ -54,7 +48,8 @@ export default function TransactionHistoryModal({ open, onClose, friendId, frien
     // Row component for react-window
     const Row = ({ index, style }: { index: number; style: React.CSSProperties }) => {
         const transaction = transactions[index];
-        const isCreator = transaction.creatorId._id === user?._id;
+        const creator = transaction.creatorId as { _id: string; username: string }; // Handle populated field
+        const isCreator = creator._id === user?._id;
 
         // Determine if this transaction was "I gave" or "I received"
         // Lend + Creator=Me => I gave
@@ -78,11 +73,11 @@ export default function TransactionHistoryModal({ open, onClose, friendId, frien
             }
         } else {
             if (transaction.type === 'lend') {
-                typeLabel = `${transaction.creatorId.username} lent you`;
+                typeLabel = `${creator.username} lent you`;
                 color = 'success.main'; // Money came to me
                 amountPrefix = '+';
             } else {
-                typeLabel = `${transaction.creatorId.username} borrowed`;
+                typeLabel = `${creator.username} borrowed`;
                 color = 'error.main'; // Money left me
                 amountPrefix = '-';
             }
@@ -203,7 +198,7 @@ export default function TransactionHistoryModal({ open, onClose, friendId, frien
                     ) : (
                         <AutoSizer
                             renderProp={({ height, width }) => (
-                                <List<{}>
+                                <List<object>
                                     style={{ height: height ?? 0, width: width ?? 0 }}
                                     rowProps={{}}
                                     rowCount={transactions.length}

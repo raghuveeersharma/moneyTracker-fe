@@ -88,7 +88,7 @@ export default function TransactionModal({ open, onClose, transaction }: Props) 
                 setSelectedFriend(null);
             }
         }
-    }, [transaction, reset, open, friends]); // Removed selectedFriend from deps to rely on state update mechanism
+    }, [transaction, reset, open, friends, selectedFriend]); // Added selectedFriend to deps
 
     const handleFriendChange = (friend: Friend | null) => {
         setSelectedFriend(friend);

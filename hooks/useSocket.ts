@@ -44,7 +44,6 @@ export const useSocket = () => {
       
       // Update local state if different
       if (socket !== socketInstance) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setSocket(socketInstance);
       }
 
@@ -67,6 +66,7 @@ export const useSocket = () => {
         };
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, user]); // Removed socket from deps to avoid loop
     
 
