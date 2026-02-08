@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useSocket } from '../../../hooks/useSocket';
+import { useTyping } from '../../../hooks/useTyping';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store';
 import {
@@ -27,6 +28,13 @@ export default function ChatPage() {
     const dispatch = useDispatch();
 
     const [markMessagesAsRead] = useMarkMessagesAsReadMutation();
+
+    // Use custom typing hook
+    const { isFriendTyping, handleUserTyping } = useTyping({
+        socket,
+        selectedFriendId: selectedFriend?._id,
+        user
+    });
 
     // Fetch messages for selected friend
     const { data: serverMessages, isLoading: loadingMessages } = useGetMessagesQuery(
@@ -85,7 +93,7 @@ export default function ChatPage() {
     // Scroll to bottom when messages change
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [localMessages]);
+    }, [localMessages, isFriendTyping]);
 
     // Clear messages when switching friends
     // Also mark as read
@@ -106,62 +114,6 @@ export default function ChatPage() {
         const content = inputText.trim();
         setInputText('');
 
-        // Optimistically add to local messages
-        // Optimistically add to local messages (temporary ID)
-        // We will replace this with the real message when it comes back via socket if we want,
-        // but for now let's just push it. The socket event might duplicate it if we are not careful.
-        // Actually, since we emit from server, we will receive it back.
-        // However, for instant feedback, we show it. 
-        // We need to deduplicate based on ID or content/timestamp if possible.
-        // The server message will have a real MongoID.
-
-        // Strategy: showing optimistic message is good UX.
-        // But since we rely on server event now, we might get a duplicate if we don't match them.
-        // Simple approach for now: Do NOT add optimistically here if we expect fast server response.
-        // OR add it, and when server response comes, simple deduplication relies on ID.
-        // But optimistic ID is Date.now(), server ID is ObjectId.
-
-        // Let's rely on the socket event for consistency for now to allow verifying the "real-time" aspect.
-        // If it feels slow, we can add optimistic UI later.
-
-        // actually, user wants to see their message immediately.
-        // Let's keep optimistic add, but maybe we should rely on the mutation result to update the ID?
-        // The `sendMessage` mutation returns the saved message.
-        // We can use that to update the list.
-
-        // Update: Removed manual socket emit.
-        // We will rely on:
-        // 1. Optimistic UI (immediate)
-        // 2. API response (confirmation)
-        // 3. Socket event (real-time for others, but sender gets it too)
-
-        // The sender receives their OWN message via socket too because we emitted to `req.user.id`.
-        // So we will get a duplicate if we have optimistic UI + socket listener.
-
-        // Let's REMOVE strict optimistic UI push here and rely on the socket event from the server
-        // to prove the real-time connection works. This is what the user is debugging.
-        // If the socket works, the message will appear immediately after DB save.
-
-        // Wait, `sendMessage` mutation invalidates 'Message' tag.
-        // `useGetMessagesQuery` might refetch.
-        // If we have local state + refetch, it's complex.
-
-        // The current code has a local state `localMessages` initialized from `serverMessages`.
-        // If `useGetMessagesQuery` refetches, `useEffect` at line 35 updates `localMessages`.
-        // This handles the sender's view.
-        // The socket event handles real-time for *others* (and sender if they have other tabs).
-
-        // So for the Sender:
-        // 1. Call API.
-        // 2. API succeeds, RTK Query cache updates (invalidation).
-        // 3. Component re-renders with new list.
-
-        // So we don't technically need to `setLocalMessages` manually if cache invalidation works.
-        // BUT `localMessages` is state. `useEffect` syncs it.
-
-        // Let's remove the manual socket emit and the optimistic push to simplify debugging
-        // and rely on the Source of Truth (Server).
-
         // Persist to database
         try {
             await sendMessage({ receiverId: selectedFriend._id, content }).unwrap();
@@ -169,6 +121,11 @@ export default function ChatPage() {
         } catch (error) {
             console.error('Failed to save message:', error);
         }
+    };
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setInputText(e.target.value);
+        handleUserTyping();
     };
 
     return (
@@ -249,6 +206,13 @@ export default function ChatPage() {
                                         </Box>
                                     ))
                                 )}
+                                {isFriendTyping && (
+                                    <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 1, ml: 1 }}>
+                                        <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                                            {selectedFriend.username} is typing...
+                                        </Typography>
+                                    </Box>
+                                )}
                                 <div ref={messagesEndRef} />
                             </Box>
                             <Box sx={{ p: 2, display: 'flex', gap: 1 }}>
@@ -256,7 +220,7 @@ export default function ChatPage() {
                                     fullWidth
                                     placeholder="Type a message..."
                                     value={inputText}
-                                    onChange={(e) => setInputText(e.target.value)}
+                                    onChange={handleInputChange}
                                     onKeyDown={(e) => {
                                         if (e.key === 'Enter' && !e.shiftKey) {
                                             e.preventDefault();

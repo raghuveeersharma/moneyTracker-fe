@@ -42,7 +42,7 @@ export const transactionApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['Transaction'],
     }),
-    getFriendTransactions: builder.query<any, { friendId: string; page: number; limit: number }>({
+    getFriendTransactions: builder.query<{ transactions: Transaction[], stats: { netBalance: number, totalGiven: number, totalReceived: number } }, { friendId: string; page: number; limit: number }>({
       query: ({ friendId, page, limit }) => `/transactions/friend/${friendId}?page=${page}&limit=${limit}`,
       providesTags: ['Transaction'],
     }),

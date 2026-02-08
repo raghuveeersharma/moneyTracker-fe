@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useSocket } from '../hooks/useSocket';
 import { useDispatch } from 'react-redux';
 import { apiSlice } from '../features/api/apiSlice';
+import { ChatMessage } from '../features/messages/messageApi';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 
@@ -25,7 +26,7 @@ export default function GlobalSocketListener() {
     useEffect(() => {
         if (!socket) return;
 
-        const handleReceiveMessage = (message: any) => {
+        const handleReceiveMessage = (message: ChatMessage) => {
             console.log('Global listener received message:', message);
             // Invalidate 'Friend' tag to refetch friends list (and unread counts)
             dispatch(apiSlice.util.invalidateTags(['Friend']));
