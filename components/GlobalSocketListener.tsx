@@ -62,7 +62,7 @@ export default function GlobalSocketListener() {
         return () => {
             socket.off('receive_message', handleReceiveMessage);
         };
-    }, [socket, dispatch]);
+    }, [socket, dispatch, router, user]);
 
     return null;
 }

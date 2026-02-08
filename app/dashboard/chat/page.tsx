@@ -103,7 +103,7 @@ export default function ChatPage() {
         if (selectedFriend) {
             markMessagesAsRead(selectedFriend._id);
         }
-    }, [selectedFriend?._id, markMessagesAsRead]);
+    }, [selectedFriend, markMessagesAsRead]);
 
     const handleSend = async () => {
         if (!selectedFriend || !inputText.trim() || !user) {

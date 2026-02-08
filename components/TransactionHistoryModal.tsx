@@ -198,7 +198,7 @@ export default function TransactionHistoryModal({ open, onClose, friendId, frien
                     ) : (
                         <AutoSizer
                             renderProp={({ height, width }) => (
-                                <List<unknown>
+                                <List<object>
                                     style={{ height: height ?? 0, width: width ?? 0 }}
                                     rowProps={{}}
                                     rowCount={transactions.length}
